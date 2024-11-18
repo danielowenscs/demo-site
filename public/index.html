@@ -54,59 +54,54 @@
         }
 
         // Salesforce Embedded Service Initialization
-        const initESW = function (gslbBaseURL) {
-          if (window.embedded_svc && window.embedded_svc.menu) {
-            console.log("Initializing Salesforce Embedded Service...");
-            window.embedded_svc.menu.init(
-              "https://d8v000002llhxua4-dev-ed.develop.my.salesforce.com", // Salesforce URL
-              "https://d.la5-c1-ia4.salesforceliveagent.com/chat",        // Chat service URL
-              gslbBaseURL,
-              "00D8V000002LLHX",                                          // Org ID
-              "AgentForceService_WebChannel"                              // Deployment name
-            );
-            setTimeout(() => {
-              if (window.embedded_svc.menu && window.embedded_svc.menu.open) {
-                console.log("Opening channel menu...");
-                window.embedded_svc.menu.open();
-              } else {
-                console.error("Menu open function not available.");
+        const initESW = function (scrt2URL) {
+          if (window.embeddedservice_bootstrap) {
+            console.log("Initializing Salesforce Embedded Messaging...");
+            embeddedservice_bootstrap.init(
+              "00DO8000007Bicp", // Salesforce Org ID
+              "test_webservice", // Deployment Name
+              "https://healthevolution--stackdevaf.sandbox.my.site.com/ESWtestwebservice1731958405344", // Base URL
+              {
+                scrt2URL: "https://healthevolution--stackdevaf.sandbox.my.salesforce-scrt.com", // Secure URL
               }
-            }, 2000);
+            );
+            console.log("Salesforce Embedded Messaging initialized.");
+            console.log('UPDATE 1');
           } else {
-            console.error("embedded_svc.menu is not defined.");
+            console.error("embeddedservice_bootstrap is not defined.");
           }
         };
 
         const loadSalesforceScript = () => {
           const script = document.createElement("script");
           script.src =
-            "https://d8v000002llhxua4-dev-ed.develop.my.salesforce.com/embeddedservice/menu/fab.min.js";
+            "https://healthevolution--stackdevaf.sandbox.my.site.com/ESWtestwebservice1731958405344/assets/js/bootstrap.min.js";
           script.onload = () => {
             console.log("Salesforce script loaded.");
             waitForEmbeddedService(() => {
-              console.log("embedded_svc is now available:", window.embedded_svc);
-              initESW(null);
+              console.log("embeddedservice_bootstrap is now available:", window.embeddedservice_bootstrap);
+              initESW("https://healthevolution--stackdevaf.sandbox.my.salesforce-scrt.com");
             });
           };
           script.onerror = () => {
-            console.error("Failed to load the Salesforce Embedded Service script.");
+            console.error("Failed to load the Salesforce Embedded Messaging script.");
           };
           document.body.appendChild(script);
         };
 
         const waitForEmbeddedService = (callback) => {
           const checkInterval = setInterval(() => {
-            if (window.embedded_svc) {
+            if (window.embeddedservice_bootstrap) {
               clearInterval(checkInterval);
               callback();
             }
           }, 100);
         };
 
-        if (!window.embedded_svc || !window.embedded_svc.menu) {
+        if (!window.embeddedservice_bootstrap) {
           loadSalesforceScript();
         } else {
-          initESW("https://service.force.com");
+          initESW("https://healthevolution--stackdevaf.sandbox.my.salesforce-scrt.com");
         }
       });
     </script>
