@@ -57,6 +57,9 @@
         const initESW = function (scrt2URL) {
           if (window.embeddedservice_bootstrap) {
             console.log("Initializing Salesforce Embedded Messaging...");
+            embeddedservice_bootstrap.settings = embeddedservice_bootstrap.settings || {};
+            embeddedservice_bootstrap.settings.language = "en"; // Set language here
+            embeddedservice_bootstrap.settings.devMode = true;
             embeddedservice_bootstrap.init(
               "00DO8000007Bicp", // Salesforce Org ID
               "test_webservice", // Deployment Name
@@ -66,7 +69,7 @@
               }
             );
             console.log("Salesforce Embedded Messaging initialized.");
-            console.log('UPDATE 1');
+            console.log("VERSION: 3");
           } else {
             console.error("embeddedservice_bootstrap is not defined.");
           }
