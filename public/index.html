@@ -1,17 +1,114 @@
 <!DOCTYPE html>
-<html lang="">
+<html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- Firebase SDKs -->
+    <script defer src="/__/firebase/11.0.2/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-performance-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
+    <div>AGENT FORCE DEMO</div>
+    <p id="load">Loading...</p>
+
+    <!-- Salesforce Embedded Service Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loadEl = document.querySelector("#load");
+
+        // Initialize Firebase
+        try {
+          let app = firebase.app();
+          let features = [
+            "auth",
+            "database",
+            "firestore",
+            "functions",
+            "messaging",
+            "storage",
+            "analytics",
+            "remoteConfig",
+            "performance",
+          ].filter((feature) => typeof app[feature] === "function");
+          if (loadEl) {
+            loadEl.textContent = `Firebase SDK loaded with ${features.join(", ")}`;
+          } else {
+            console.warn("#load element not found.");
+          }
+        } catch (e) {
+          console.error(e);
+          if (loadEl) {
+            loadEl.textContent = "Error loading the Firebase SDK, check the console.";
+          }
+        }
+
+        // Salesforce Embedded Service Initialization
+        const initESW = function (gslbBaseURL) {
+          if (window.embedded_svc && window.embedded_svc.menu) {
+            console.log("Initializing Salesforce Embedded Service...");
+            window.embedded_svc.menu.init(
+              "https://d8v000002llhxua4-dev-ed.develop.my.salesforce.com", // Salesforce URL
+              "https://d.la5-c1-ia4.salesforceliveagent.com/chat",        // Chat service URL
+              gslbBaseURL,
+              "00D8V000002LLHX",                                          // Org ID
+              "AgentForceService_WebChannel"                              // Deployment name
+            );
+            setTimeout(() => {
+              if (window.embedded_svc.menu && window.embedded_svc.menu.open) {
+                console.log("Opening channel menu...");
+                window.embedded_svc.menu.open();
+              } else {
+                console.error("Menu open function not available.");
+              }
+            }, 2000);
+          } else {
+            console.error("embedded_svc.menu is not defined.");
+          }
+        };
+
+        const loadSalesforceScript = () => {
+          const script = document.createElement("script");
+          script.src =
+            "https://d8v000002llhxua4-dev-ed.develop.my.salesforce.com/embeddedservice/menu/fab.min.js";
+          script.onload = () => {
+            console.log("Salesforce script loaded.");
+            waitForEmbeddedService(() => {
+              console.log("embedded_svc is now available:", window.embedded_svc);
+              initESW(null);
+            });
+          };
+          script.onerror = () => {
+            console.error("Failed to load the Salesforce Embedded Service script.");
+          };
+          document.body.appendChild(script);
+        };
+
+        const waitForEmbeddedService = (callback) => {
+          const checkInterval = setInterval(() => {
+            if (window.embedded_svc) {
+              clearInterval(checkInterval);
+              callback();
+            }
+          }, 100);
+        };
+
+        if (!window.embedded_svc || !window.embedded_svc.menu) {
+          loadSalesforceScript();
+        } else {
+          initESW("https://service.force.com");
+        }
+      });
+    </script>
   </body>
 </html>
